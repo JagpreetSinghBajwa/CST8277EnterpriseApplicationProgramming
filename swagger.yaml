@@ -1,0 +1,950 @@
+swagger: '2.0'
+info:
+  description: API contract for management service
+    
+  version: 1.0.0
+  title: Swagger Petstore
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+# host: petstore.swagger.io
+# basePath: /v2
+# schemes:
+# - http
+paths:
+  /user:
+    post:
+      tags:
+        - "User"
+      summary: Create user
+      operationId: createUser
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: body
+        name: 'create Account'
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+            externalUserId:
+              type: string
+            organizationId:
+              type: string
+            userGroupId:
+              type: string
+      responses:
+        201:
+          description: Account created successfully.
+          schema:
+            $ref: '#/definitions/User'
+        500:
+          description: Internal error
+          
+    get:
+      tags:
+        - "User"
+      summary: Get user list
+      operationId: getUserList
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - $ref: '#/parameters/pageNum'
+      - $ref: '#/parameters/pageSize'
+      - in: query
+        type: string
+        required: false
+        name: name
+        description: name filter
+      - in: query
+        type: string
+        required: false
+        name: email
+        description: email filter
+      responses:
+        200:
+          description: OK.
+          schema:
+            type: object
+            properties:
+              users:
+                type: array
+                items:
+                  $ref: '#/definitions/User'
+              pagingInfo:
+                $ref: '#/definitions/PagingInfo'
+        500:
+          description: Internal error
+  /login:
+    get:
+      tags:
+        - "User"
+      summary: Get login credential
+      operationId: userLogin
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - $ref: '#/parameters/pageNum'
+      - $ref: '#/parameters/pageSize'
+      - in: query
+        type: string
+        required: false
+        name: name
+        description: name filter
+      - in: query
+        type: string
+        required: false
+        name: email
+        description: email filter
+      responses:
+        200:
+          description: OK.
+          schema:
+            type: object
+            properties:
+              users:
+                type: array
+                items:
+                  $ref: '#/definitions/User'
+              pagingInfo:
+                $ref: '#/definitions/LoginResponse'
+        500:
+          description: Internal error
+  /logout:
+    post:
+      tags:
+        - "User"
+      parameters:
+      - $ref: '#/parameters/pageNum'
+      - $ref: '#/parameters/pageSize'
+      - in: query
+        type: string
+        required: false
+        name: name
+        description: name filter
+      - in: query
+        type: string
+        required: false
+        name: email
+        description: email filter
+      responses:
+        200:
+          description: 'OK'
+        401:
+          description: 'Unauthorised'
+        
+  /users/{userId}/roles:
+    get:
+      tags:
+        - "User"
+      summary: get roles of user
+      operationId: getUserRoles
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/UserRoles'
+        500:
+          description: Internal Error
+          
+    post:
+      tags:
+        - "User"
+      summary: Update user roles
+      operationId: updateUserRoles
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        type: string
+      - in: body
+        name: 'update User Roles'
+        schema:
+          type: object
+          properties:
+            roleIdsToAssign:
+              type: array
+              items:
+                type: string
+            roleIdsToRemove:
+              type: array
+              items:
+                type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/UserRoles'
+        500:
+          description: Internal Error
+  /users/{userId}:
+    get:
+      tags:
+        - "User"
+      summary: Retrieve a specific user
+      operationId: retrieveUser
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        404:
+          description: "Not found"
+        500:
+          description: Internal Error
+            
+    put:
+      tags:
+        - "User"
+      summary: Update user
+      operationId: updateUser
+      produces:
+      - "application/json"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        type: string
+      - in: body
+        name: 'Updated User Record'
+        required: true
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+            externalUserId:
+              type: string
+            organizationId:
+              type: string
+            userGroupId:
+              type: string
+      responses:
+        200:
+          description: Updated successfully.
+          schema:
+            $ref: '#/definitions/User'
+        404:
+          description: "Not found"
+        500:
+          description: Internal Error
+          
+    delete:
+      tags:
+        - "User"
+      summary: Delete user
+      operationId: deleteUser
+      produces:
+      - "application/json"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+        404:
+          description: "Not found"
+        500:
+          description: Internal Error
+
+  /roles:
+    post:
+      tags:
+        - "Roles"
+      summary: Create role
+      operationId: createRole
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: body
+        name: 'create Role'
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            permissions:
+              type: array
+              items:
+                type: string
+      responses:
+        201:
+          description: Role created successfully.
+          schema:
+            $ref: '#/definitions/Role'
+        500:
+          description: Internal error
+          
+    get:
+      tags:
+        - "Roles"
+      summary: Get all roles
+      operationId: getAllRoles
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - $ref: '#/parameters/pageNum'
+      - $ref: '#/parameters/pageSize'
+      - in: query
+        type: string
+        required: false
+        name: name
+        description: role name filter
+      responses:
+        200:
+          description: OK.
+          schema:
+            type: object
+            properties:
+              roles:
+                type: array
+                items:
+                  $ref: '#/definitions/Role'
+              pagingInfo:
+                $ref: '#/definitions/PagingInfo'
+        500:
+          description: Internal error
+          
+  /roles/{roleId}:
+    get:
+      tags:
+        - "Roles"
+      summary: get a specific role
+      operationId: getRole
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: roleId
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Role'
+        404:
+          description: "Not found"
+        500:
+          description: Internal Error
+            
+    put:
+      tags:
+        - "Roles"
+      summary: Update role
+      operationId: updateRole
+      produces:
+      - "application/json"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: path
+        name: roleId
+        required: true
+        type: string
+      - in: body
+        name: updatedRoleData
+        required: true
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            permissions:
+              type: array
+              items:
+                type: string
+      responses:
+        200:
+          description: Role Updated successfully.
+          schema:
+            $ref: '#/definitions/Role'
+        404:
+          description: "Not found"
+        500:
+          description: Internal Error
+          
+    delete:
+      tags:
+        - "Roles"
+      summary: Delete role
+      operationId: deleteRole
+      produces:
+      - "application/json"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: path
+        name: roleId
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+        404:
+          description: "Not found"
+        500:
+          description: Internal Error
+          
+      
+  /events:
+    post:
+      tags:
+        - "Events"
+      summary: Create event
+      operationId: createEvent
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: body
+        name: 'createEvent'
+        schema:
+          type: object
+          properties:
+            type:
+              type: string
+            description:
+              type: string
+            category:
+              type: string
+            tags:
+              type: array
+              items:
+                type: string
+            schema:
+              $ref: '#/definitions/EventSchema'
+      responses:
+        201:
+          description: Event created successfully.
+          schema:
+            $ref: '#/definitions/Event'
+        409:
+          description: Duplicate request.
+        500:
+          description: Internal error
+          
+    get:
+      tags:
+        - "Events"
+      summary: Get all events
+      operationId: getAllEvents
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - $ref: '#/parameters/pageNum'
+      - $ref: '#/parameters/pageSize'
+      - in: query
+        type: string
+        required: false
+        name: category
+        description: event category filter
+      - in: query
+        type: string
+        required: false
+        name: type
+        description: event type filter
+      - in: query
+        type: string
+        required: false
+        name: tags
+        description: tags to consider
+      - in: query
+        required: false
+        name: sortBy
+        type: string
+        description: 'sorting'
+      - in: query
+        name: sortOrder
+        type: string
+        default: asc
+        description: Order for sorting the list. Possible values are "asc" or "desc"
+      responses:
+        200:
+          description: OK.
+          schema:
+            type: object
+            properties:
+              events:
+                type: array
+                items:
+                  $ref: '#/definitions/Event'
+              pagingInfo:
+                $ref: '#/definitions/PagingInfo'
+        500:
+          description: Internal error
+  
+  /events/{eventId}:
+    get:
+      tags:
+        - "Events"
+      summary: Retrieve a specific event
+      operationId: retrieveEvent
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Event'
+        404:
+          description: "Not found"
+        500:
+          description: Internal Error
+            
+    put:
+      tags:
+        - "Events"
+      summary: Update an existing event
+      operationId: updateEvent
+      produces:
+      - "application/json"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        type: string
+      - in: body
+        name: updatedEventData
+        required: true
+        schema:
+          type: object
+          properties:
+            type:
+              type: string
+            description:
+              type: string
+            category:
+              type: string
+            'schema':
+              $ref: '#/definitions/EventSchema'
+      responses:
+        200:
+          description: Updated successfully.
+          schema:
+            $ref: '#/definitions/Event'
+        404:
+          description: "Not found"
+        500:
+          description: Internal Error
+          
+    delete:
+      tags:
+        - "Events"
+      summary: Delete event
+      operationId: deleteEvent
+      produces:
+      - "application/json"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+        404:
+          description: Not Found
+        500:
+          description: Internal Error
+    
+          
+  /subscriptions:
+    post:
+      tags:
+        - "Subscriptions"
+      summary: Create subscription
+      operationId: createSubscription
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: body
+        name: 'subscriptionRequest'
+        schema:
+          $ref: '#/definitions/SubscriptionRequest'
+      responses:
+        201:
+          description: Subscribed successfully
+        500:
+          description: Internal Error
+        
+    get:
+      tags:
+        - "Subscriptions"
+      summary: Get all subscriptions
+      operationId: getSubscriptions
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - $ref: '#/parameters/pageNum'
+      - $ref: '#/parameters/pageSize'
+      - in: query
+        type: string
+        required: false
+        name: eventType
+        description: event type filter
+      - in: query
+        type: string
+        required: false
+        name: tenantId
+        description: tenantId filter
+      responses:
+        201:
+          description: OK
+          schema:
+            type: object
+            properties:
+              subscriptions:
+                type: array
+                items:
+                  $ref: '#/definitions/Subscription'
+              pagingInfo:
+                $ref: '#/definitions/PagingInfo'
+        
+  /subscriptions/{subscriptionId}:
+    put:
+      tags:
+        - "Subscriptions"
+      summary: Update subscription
+      operationId: updateSubscription
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: subscriptionId
+        required: true
+        type: string
+      - in: body
+        name: 'updatedSubscription'
+        schema:
+          $ref: '#/definitions/SubscriptionRequest'
+      responses:
+        200:
+          description: Updated successfully
+          schema:
+            $ref: '#/definitions/Subscription'
+        404:
+          description: "Not found"
+        500:
+          description: Internal Error
+          
+    get:
+      tags:
+        - "Subscriptions"
+      summary: Get a subscription
+      operationId: getSubscription
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: subscriptionId
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Subscription'
+        404:
+          description: "Not found"
+        500:
+          description: Internal Error
+          
+    delete:
+      tags:
+        - "Subscriptions"
+      summary: Delete a subscription
+      operationId: deleteSubscription
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: subscriptionId
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+        404:
+          description: "Not found"
+        500:
+          description: Internal Error
+          
+  /notifyevent:
+    post:
+      tags:
+        - "Event Publishing"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      operationId: notifyEvent
+      parameters:
+      - in: body
+        name: eventData
+        required: true
+        schema:
+          $ref: '#/definitions/EventData'
+      responses:
+        200:
+          description: OK
+        500:
+          description: Internal Error
+    
+parameters:
+  pageNum:
+    name: pageNum
+    in: query
+    description: The page number to start from
+    required: false
+    type: integer
+    format: int32
+  pageSize:
+    name: pageSize
+    in: query
+    description: The page size to use
+    required: false
+    type: integer
+    format: int32
+
+definitions:
+  ConfigurationHeader:
+    type: object
+    properties:
+      name:
+        type: string
+      value:
+        type: string
+  SubscriptionRequest:
+    type: object
+    properties:
+      tenantId:
+        type: string
+      subscriptionHandlerId:
+        type: string
+      eventIds:
+        type: array
+        items:
+          type: string
+          
+  Subscription:
+    type: object
+    properties:
+      id:
+        type: string
+      tenantId:
+        type: string
+        example: tenant id / * for all tenants
+      subscribedEvents:
+        type: array
+        items:
+          $ref: '#/definitions/Event'
+  
+  User:
+    type: object
+    properties:
+      id:
+        type: string
+      userGroupId:
+        type: string
+      externalUserId:
+        type: string
+      name:
+        type: string
+      organizationId:
+        type: string
+      email:
+        type: string
+  
+  UserRoles:
+    type: object
+    properties:
+      assignedRoles:
+        type: array
+        items:
+          $ref: '#/definitions/Role'
+ 
+  Role:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      permissions:
+        type: array
+        items:
+          type: string
+  
+  Event:
+    type: object
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+      description:
+        type: string
+      category:
+        type: string
+      tags:
+        type: array
+        items:
+          type: string
+      schema:
+        $ref: '#/definitions/EventSchema'
+        
+  EventData:
+    type: object
+    properties:
+      eventId:
+        type: string
+      source:
+        type: string
+      tenantId:
+        type: string
+      data:
+        type: object
+      timestamp:
+        type: number
+    required:
+      - eventId
+      - data
+      - source
+      - timestamp
+      
+  EventSchema:
+    type: object
+    properties:
+      root:
+        $ref: '#/definitions/SchemaField'
+  LoginResponse:
+    type: object
+    properties:
+        id:
+          description: 'The ID of the logged in user'
+          type: integer
+          format: int64
+        token:
+          description: 'A token to be used to verify future calls'
+          type: string            
+  SchemaField:
+    type: object
+    properties:
+      type:
+        type: string
+      description:
+        type: string
+      collectionSchema:
+        type: object
+        $ref: '#/definitions/SchemaField'
+      fields:
+        type: array
+        items:
+          $ref: '#/definitions/AttachableField'
+      
+  AttachableField:
+    type: object
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+      description:
+        type: string
+      mandatory:
+        type: boolean
+      collectionSchema:
+        type: object
+        $ref: '#/definitions/SchemaField'  
+      fields:
+        type: array
+        items:
+          $ref: '#/definitions/AttachableField'
+        
+  PagingInfo:
+    type: object
+    properties:
+      limit:
+        type: integer
+      offset:
+        type: integer
+      total:
+        type: integer
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+# Added by API Auto Mocking Plugin
+host: virtserver.swaggerhub.com
+basePath: /jaaadooo/subpub/1.0.0
+schemes:
+ - https
+ - http
